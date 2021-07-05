@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springdatajdbc.mapper.KikouMapper">
+
+    <select id="selectStudentJoin" resultType="com.example.springdatajdbc.model.Student" resultMap="StudentMap">
+        SELECT s.id,
+               s.name,
+               b.id AS plonk,
+               b.name AS kikou
+          FROM student AS s
+     LEFT JOIN book AS b ON s.id = b.student_id
+         WHERE s.id = #{id}
+    </select>
+    <!-- plonk et kikou sont obligatoires sinon télescopage avec les colonnes "id" et "name" de la table "Student"-->
+
+    <resultMap id="StudentMap" type="com.example.springdatajdbc.model.Student">
+        <!-- constructor est obligatoire pour choisir quel constructeur utiliser parmi ceux définis dans la class Student -->
+        <constructor>
+            <arg column="id" javaType="java.lang.String" />
+            <arg column="name" javaType="java.lang.String" />
+        </constructor>
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <collection column="student_id" property="books" javaType="ArrayList" ofType="com.example.springdatajdbc.model.Book">
+            <!-- constructor est obligatoire pour éviter ce qui suit... -->
+            <!-- même s'il n'y a pas d'enregistrements ou plein dans la table book
+                 alors ça crée une liste contenant un seul Book avec les ptés "id" et "name" du Student... -->
+            <constructor>
+                <arg column="plonk" javaType="java.lang.String" />
+                <arg column="kikou" javaType="java.lang.String" />
+            </constructor>
+        </collection>
+    </resultMap>
+</mapper>
